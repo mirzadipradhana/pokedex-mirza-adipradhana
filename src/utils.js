@@ -3,3 +3,23 @@ export const toTitleCase = text =>
     /\w\S*/g,
     txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
   );
+
+export const formatUnicorn = (str, ...args) => {
+  let inputtedStr = str.toString();
+  const totalArgs = args.length;
+
+  if (totalArgs) {
+    for (let i = 0; i < totalArgs; i++) {
+      try {
+        inputtedStr = inputtedStr.replace(
+          new RegExp(`\\{${i}\\}`, 'gi'),
+          args[i]
+        );
+      } catch (e) {
+        console.error(`Error: ${e}`);
+      }
+    }
+  }
+
+  return inputtedStr;
+};
