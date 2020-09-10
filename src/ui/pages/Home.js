@@ -1,34 +1,21 @@
 import React from 'react';
 import { List } from 'semantic-ui-react'
+import InfiniteLoadingList from 'react-simple-infinite-loading'
 
 import logo from '../../assets/logo.png';
 import LoadingOverlay from '../components/LoadingOverlay';
 import Link from '../components/Link';
 import Card from '../components/Card'
-import useDataFetching from '../hooks/useDataFetching';
+import usePokemon from '../hooks/usePokemon';
 
-import {BASE_URL, IMAGE_URL} from '../../config'
+import {IMAGE_URL} from '../../config'
 import {formatUnicorn} from '../../utils'
 
 function Home() {
-  const url = `${BASE_URL}/pokemon`;
+  const {pokemons, loading, error, loadMore, hasNextPage} = usePokemon();
 
-  const { loading, data, error } = useDataFetching(
-    url,
-    {
-      resolver: (result) => ({
-        ...result,
-        results: result.results.map(res => {
-          const regex = new RegExp(`^${url}/([0-9]{1,10})/`);
-          const id = regex.exec(res.url)[1];
-          return {
-            ...res,
-            id: parseInt(id)
-          };
-        })
-      })
-    }
-  )
+  const handleMore = loading ? () => {} : loadMore
+  const isPokemonLoaded = index => !hasNextPage || index < pokemons.length
 
   if (loading || error) {
     return !error ? <LoadingOverlay>Please wait...</LoadingOverlay> : error.message;
@@ -38,22 +25,29 @@ function Home() {
     <div className="Home">
       <header className="Home-header">
         <img src={logo} className="Home-logo" alt="logo" />
-        <List divided relaxed>
-          {data.results.map(d => (
-             <List.Item key={`item-${d.id}`}>
-               <List.Content>
+      </header>
+      <div className="list-container">
+        <InfiniteLoadingList
+          itemHeight={220}
+          hasMoreItems={hasNextPage}
+          loadMoreItems={handleMore}
+          customScrollbar
+        >
+          {pokemons.map(d => (
+            <List.Item key={`item-${d.id}`}>
+              <List.Content>
                   <List.Header as={({children}) => (
                     <Link to={`/detail/${d.id}`}>
                       {children}
                     </Link>
                   )}>
-                    <Card src={formatUnicorn(IMAGE_URL, d.id)} title={d.name} />
+                    <Card src={formatUnicorn(IMAGE_URL, d.id)} title={d.name}></Card>
                   </List.Header>
                 </List.Content>
-             </List.Item>
+            </List.Item>
           ))}
-        </List>
-      </header>
+        </InfiniteLoadingList>
+      </div>
     </div>
   );
 }

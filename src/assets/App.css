@@ -35,3 +35,10 @@
     transform: rotate(360deg);
   }
 }
+
+.list-container {
+  width: 100%;
+  height: calc(100vh - (102.984px + 50px));
+  margin: auto;
+  margin-top: 50px;
+} 

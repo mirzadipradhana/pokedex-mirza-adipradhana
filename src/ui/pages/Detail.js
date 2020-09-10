@@ -1,12 +1,19 @@
 import React from 'react';
+import {Card} from 'semantic-ui-react';
+import styled from 'styled-components'
 
 import logo from '../../assets/logo.png';
 import LoadingOverlay from '../components/LoadingOverlay';
 import Link from '../components/Link';
+import PokeCard from '../components/Card'
 import useDataFetching from '../hooks/useDataFetching';
-import {toTitleCase} from '../../utils'
+import {toTitleCase, } from '../../utils'
 
 import {BASE_URL} from '../../config';
+
+const ExtraContent = styled.div`
+  font-size: 12px;
+`;
 
 function Detail(props) {
   const url = `${BASE_URL}/pokemon/${props.match.params.id}/`;
@@ -17,19 +24,26 @@ function Detail(props) {
     return !error ? <LoadingOverlay>Please wait...</LoadingOverlay> : error.message;
   }
 
-  debugger
-
   return (
     <div>
       <header>
-        <img src={logo} className="Home-logo" alt="logo" />
+        <div>
+          <img src={logo} className="Home-logo" alt="logo" />
+        </div>
         <Link to="/">
           Go To Home
         </Link>
       </header>
-      <h1>
-        {toTitleCase(data.name)}
-      </h1>
+      <PokeCard src={(data.sprites.front_shiny)} title={toTitleCase(data.name)}>
+        <Card.Content extra>
+          <ExtraContent>
+            Abilities: {data.abilities.map(ab => ab.ability.name).join(',')}
+          </ExtraContent>
+          <ExtraContent>
+            Types: {data.types.map(ty => ty.type.name).join(',')}
+          </ExtraContent>
+        </Card.Content>
+      </PokeCard>
     </div>
   );
 }
