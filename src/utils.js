@@ -23,3 +23,12 @@ export const formatUnicorn = (str, ...args) => {
 
   return inputtedStr;
 };
+
+export const snakeCaseToTitle = text => {
+  if (typeof text !== 'string') return '';
+  const words = text.split('_');
+  words.forEach((word, idx, words) => {
+    words[idx] = toTitleCase(word);
+  });
+  return words.join(' ');
+};

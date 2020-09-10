@@ -30,6 +30,7 @@ const useDataFetching = (initUrl, options = {}) => {
     }
 
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
 
   const fetchMore = (nextUrl) => {

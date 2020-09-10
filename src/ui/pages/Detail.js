@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Card} from 'semantic-ui-react';
 import styled from 'styled-components'
 
@@ -34,7 +35,7 @@ function Detail(props) {
           Go To Home
         </Link>
       </header>
-      <PokeCard src={(data.sprites.front_shiny)} title={toTitleCase(data.name)}>
+      <PokeCard src={(data.sprites.front_default)} title={toTitleCase(data.name)}>
         <Card.Content extra>
           <ExtraContent>
             Abilities: {data.abilities.map(ab => ab.ability.name).join(',')}
@@ -47,5 +48,13 @@ function Detail(props) {
     </div>
   );
 }
+
+Detail.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      name: PropTypes.string.isRequired
+    })
+  })
+};
 
 export default Detail;

@@ -2,18 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'semantic-ui-react';
 import styled from 'styled-components';
-import InfiniteLoadingList from 'react-simple-infinite-loading'
 
 import logo from '../../assets/logo.png';
 import LoadingOverlay from '../components/LoadingOverlay';
 import Link from '../components/Link';
 import Card from '../components/Card';
-import Filter from '../components/Filter';
-import usePokemon from '../hooks/usePokemon';
 import useDataFetching from '../hooks/useDataFetching';
 
 import {BASE_URL, IMAGE_URL} from '../../config'
-import {formatUnicorn, snakeCaseToTitle} from '../../utils'
+import {formatUnicorn} from '../../utils'
 
 const Container = styled.div`
   width: 200px;
@@ -26,19 +23,25 @@ const Container = styled.div`
   }
 `;
 
-const Home = (props) => {
-  const typeUrl = `${BASE_URL}/type`;
+const Filter = (props) => {
+  const url = `${BASE_URL}/type/${props.match.params.name}/`;
+  const {loading, data, error} = useDataFetching(
+    url, {
+      resolver: (result) => ({
+        ...result,
+        pokemon: result.pokemon.map(res => {
+          const regex = new RegExp(`^${BASE_URL}/pokemon/([0-9]{1,10})/`);
+          const id = regex.exec(res.pokemon.url)[1];
+          return {
+            ...res.pokemon,
+            id: parseInt(id)
+          };
+        })
+      })
+    }
+  );
 
-  const {pokemons, loading, error, loadMore, hasNextPage} = usePokemon();
-  const {loading: loadingFilter, data: dataFilter, error: errorFilter} = useDataFetching(typeUrl);
-
-  const handleFilterChange = (e, data) => {
-    props.history.push(`/filter/${data.value}`)
-  }
-
-  const handleMore = loading ? () => {} : loadMore
-
-  if (loading || loadingFilter || error || errorFilter) {
+  if (loading || error) {
     return !error ? <LoadingOverlay>Please wait...</LoadingOverlay> : error.message;
   }
 
@@ -46,26 +49,10 @@ const Home = (props) => {
     <div className="Home">
       <header className="Home-header">
         <img src={logo} className="Home-logo" alt="logo" />
-        <Filter
-          caption="Filter Pokemon"
-          options={
-            dataFilter.results.map(f => ({
-              key: f.name,
-              text: snakeCaseToTitle(f.name),
-              value: f.name,
-            }))
-          }
-          onChange={handleFilterChange}
-        />
       </header>
       <Container>
-        <InfiniteLoadingList
-          itemHeight={220}
-          hasMoreItems={hasNextPage}
-          loadMoreItems={handleMore}
-          customScrollbar
-        >
-          {pokemons.map(d => (
+        <List divided relaxed>
+          {data.pokemon.map(d => (
             <List.Item key={`item-${d.id}`}>
               <List.Content>
                   <List.Header as={({children}) => (
@@ -78,14 +65,18 @@ const Home = (props) => {
                 </List.Content>
             </List.Item>
           ))}
-        </InfiniteLoadingList>
+        </List>
       </Container>
     </div>
   );
 }
 
-Home.propTypes = {
-  history: PropTypes.object.isRequired
+Filter.propTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      name: PropTypes.string.isRequired
+    })
+  })
 };
 
-export default Home;
+export default Filter;

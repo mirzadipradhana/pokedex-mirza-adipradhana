@@ -7,11 +7,9 @@ import Routes from './Routes';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Router>
-      <Routes />
-    </Router>
-  </React.StrictMode>,
+  <Router>
+    <Routes />
+  </Router>,
   document.getElementById('root')
 );
 
