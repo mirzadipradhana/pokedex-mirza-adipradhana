@@ -29,7 +29,8 @@ const Routes = () => (
       component={Home}
     />
     <PublicRoute
-      path='/detail'
+      exact
+      path='/detail/:id'
       component={Detail}
     />
     <Route component={NotFound} />
